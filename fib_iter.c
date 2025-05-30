@@ -12,15 +12,17 @@ void fib_iter_intern(struct frame *base, size_t ix) {
   while (ix > 0) {
     struct frame *fp = base + ix - 1;
     struct frame *nf = base + ix;
-    if (fp->n < 2) {
-      *fp->res = 1;
-      --ix;
-    } else if (fp->fn1 == 0) {
-      nf->n = fp->n - 1;
-      nf->res = &fp->fn1;
-      nf->fn1 = 0;
-      nf->fn2 = 0;
-      ++ix;
+    if (fp->fn1 == 0) {
+      if (fp->n < 2) {
+        *fp->res = 1;
+        --ix;
+      } else {
+        nf->n = fp->n - 1;
+        nf->res = &fp->fn1;
+        nf->fn1 = 0;
+        nf->fn2 = 0;
+        ++ix;
+      }
     } else if (fp->fn2 == 0) {
       nf->n = fp->n - 2;
       nf->res = &fp->fn2;
