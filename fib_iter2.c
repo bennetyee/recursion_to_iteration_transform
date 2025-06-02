@@ -14,7 +14,6 @@ unsigned long fib_iter(unsigned long n) {
   unsigned long res = 0;
 
   stack[0].n = n;
-  stack[0].fn1 = 0;
   stack[0].cont = 0;
   ix = 1;
   while (ix > 0) {
@@ -24,7 +23,6 @@ unsigned long fib_iter(unsigned long n) {
         --ix;
       } else {
         stack[ix].n = stack[ix-1].n - 1;
-        stack[ix].fn1 = 0;
         stack[ix].cont = 0;
         stack[ix-1].cont = 1;
         ++ix;
@@ -32,7 +30,6 @@ unsigned long fib_iter(unsigned long n) {
     } else if (stack[ix-1].cont == 1) {
       stack[ix-1].fn1 = res;
       stack[ix].n = stack[ix-1].n - 2;
-      stack[ix].fn1 = 0;
       stack[ix].cont = 0;
       stack[ix-1].cont = 2;
       ++ix;
