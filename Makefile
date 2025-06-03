@@ -1,4 +1,4 @@
-TARGETS:=fib_rec fib_iter fib_iter2 fib_iter_cont fib_iter_cont2
+TARGETS:=fib_rec fib_iter fib_iter2 fib_iter_cont fib_iter_cont2 fib_rec_inlined fib_rec_inlined2
 
 CC:=gcc
 #CC:=clang
