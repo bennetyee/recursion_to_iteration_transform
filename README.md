@@ -49,11 +49,14 @@ manually inlined.  This explores whether `gcc`'s rather dramatic speed
 for it's compilation of `fib_rec.c` over `clang` is due to more
 aggressive inlining.  The generated executables are much faster than
 any of the other approaches -- for both compilers -- and the
-differences between compilers appear to be diminishing.
+differences between compilers appear to be diminishing for the
+recursive implementations.
 
 ## Performance
 
-Single execution, not averaged, so only good for "ballpark" comparisons.
+Single execution, not averaged, so only good for "ballpark"
+comparisons.  Measured on a Linux system with an Intel Core Ultra 7
+155U CPU.
 
 `gcc` 13.3:
 ```
