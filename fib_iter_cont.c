@@ -53,7 +53,7 @@ struct tailcall fib_call(struct regset *rs, unsigned long n, callcode_t cont) {
   if (n < 2) {
     --rs->sp;
     c.fn = cont;
-    c.arg = 1;
+    c.arg = n;
     c.cont = IGNORED;
   } else {
     c.fn = CALL;

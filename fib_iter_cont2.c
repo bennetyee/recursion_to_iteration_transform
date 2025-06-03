@@ -17,7 +17,7 @@ struct frame {
 };
 
 unsigned long fib_iter(unsigned long n) {
-  struct frame stack[n];
+  struct frame stack[n+2];
   size_t sp;
   callcode_t fn;
   unsigned long arg;
@@ -36,10 +36,10 @@ unsigned long fib_iter(unsigned long n) {
         stack[sp].cont = cont;
         ++sp;
         if (stack[sp - 1].n < 2) {
-          --sp;
           fn = cont;
-          arg = 1;
+          arg = stack[sp - 1].n;
           cont = IGNORED;
+          --sp;
         } else {
           fn = CALL;
           arg = stack[sp - 1].n - 1;

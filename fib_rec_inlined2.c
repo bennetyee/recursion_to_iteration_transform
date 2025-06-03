@@ -4,35 +4,35 @@
 
 unsigned long fib_rec(unsigned long n) {
   if (n < 2) {
-    return 1;
+    return n;
   }
   return (
     {
       unsigned long nn = n-1;
-      (nn < 2) ? 1 : (
+      (nn < 2) ? nn : (
         {
           unsigned long nnn = nn - 1;
-          (nnn < 2) ? 1 : fib_rec(nnn-1) + fib_rec(nnn-2);
+          (nnn < 2) ? nnn : fib_rec(nnn-1) + fib_rec(nnn-2);
         }
       ) + (
         {
           unsigned long nnn = nn - 2;
-          (nnn < 2) ? 1 : fib_rec(nnn-1) + fib_rec(nnn-2);
+          (nnn < 2) ? nnn : fib_rec(nnn-1) + fib_rec(nnn-2);
         }
       );
     }
   ) + (
     {
       unsigned long nn = n-2;
-      (nn < 2) ? 1 : (
+      (nn < 2) ? nn : (
         {
           unsigned long nnn = nn - 1;
-          (nnn < 2) ? 1 : fib_rec(nnn-1) + fib_rec(nnn-2);
+          (nnn < 2) ? nnn : fib_rec(nnn-1) + fib_rec(nnn-2);
         }
       ) + (
         {
           unsigned long nnn = nn - 2;
-          (nnn < 2) ? 1 : fib_rec(nnn-1) + fib_rec(nnn-2);
+          (nnn < 2) ? nnn : fib_rec(nnn-1) + fib_rec(nnn-2);
         }
       );
     }

@@ -15,6 +15,9 @@ void fib_iter_intern(struct frame *base, size_t ix) {
     if (fp->fn1 == 0) {
       if (fp->n < 2) {
         *fp->res = 1;
+        /*
+         * cannot use fp->n since 0 is placeholder, so 1, 1, 2, 3
+         */
         --ix;
       } else {
         nf->n = fp->n - 1;
@@ -37,15 +40,18 @@ void fib_iter_intern(struct frame *base, size_t ix) {
 }
 
 unsigned long fib_iter(unsigned long n) {
-  struct frame *stack = calloc(n, sizeof *stack);
+  struct frame *stack;
   unsigned long fn;
 
+  if (n == 0) return 0;
+
+  stack = calloc(n, sizeof *stack);
   if (stack == NULL) {
     perror("insufficient memory for stack");
     abort();
   }
 
-  stack[0].n = n;
+  stack[0].n = n-1;
   stack[0].res = &fn;
   fib_iter_intern(stack, 1);
   free(stack);

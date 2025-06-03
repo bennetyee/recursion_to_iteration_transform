@@ -9,7 +9,7 @@ struct frame {
 };
 
 unsigned long fib_iter(unsigned long n) {
-  struct frame stack[n];
+  struct frame stack[n+1];
   size_t ix;
   unsigned long res = 0;
 
@@ -19,7 +19,7 @@ unsigned long fib_iter(unsigned long n) {
   while (ix > 0) {
     if (stack[ix-1].cont == 0) {
       if (stack[ix-1].n < 2) {
-        res = 1;
+        res = stack[ix-1].n;
         --ix;
       } else {
         stack[ix].n = stack[ix-1].n - 1;

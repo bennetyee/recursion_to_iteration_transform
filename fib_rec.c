@@ -4,7 +4,7 @@
 
 unsigned long fib_rec(unsigned long n) {
   if (n < 2) {
-    return 1;
+    return n;
   }
   return fib_rec(n-1) + fib_rec(n-2);
 }
