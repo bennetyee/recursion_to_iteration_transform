@@ -28,47 +28,6 @@ impl<T> One for Matrix22<T> where T: Zero + One, T: Add + Mul, Matrix22<T>: Mul<
     }
 }
 
-impl<T> Mul<Matrix22<T>> for Matrix22<T> where for<'a> &'a T: Add<&'a T, Output = T> + Mul<&'a T, Output = T>, T: Add<Output =T> {
-    type Output = Matrix22<T>;
-
-    fn mul(self, other: Matrix22<T>) -> Self::Output {
-        Self::Output {
-            elts: [
-                [
-                    &self.elts[0][0] * &other.elts[0][0] +
-                        &self.elts[0][1] * &other.elts[1][0],
-                    &self.elts[0][0] * &other.elts[0][1] +
-                        &self.elts[0][1] * &other.elts[1][1]
-                ], [
-                    &self.elts[1][0] * &other.elts[0][0] +
-                        &self.elts[1][1] * &other.elts[1][0],
-                    &self.elts[1][0] * &other.elts[0][1] +
-                        &self.elts[1][1] * &other.elts[1][1]
-                ]
-            ]
-                    
-        }
-    }
-}
-
-impl<T> Add<Matrix22<T>> for Matrix22<T> where for<'a> &'a T: Add<&'a T, Output = T> {
-    type Output = Matrix22<T>;
-
-    fn add(self, other: Matrix22<T>) -> Self::Output {
-        Self::Output {
-            elts: [
-                [
-                    &self.elts[0][0] + &other.elts[0][0],
-                    &self.elts[0][1] + &other.elts[0][1],
-                ], [
-                    &self.elts[1][0] + &other.elts[1][0],
-                    &self.elts[1][1] + &other.elts[1][1],
-                ]
-            ]
-        }
-    }
-}
-
 impl<T> Mul<&Matrix22<T>> for &Matrix22<T> where for<'a> &'a T: Add<&'a T, Output = T> + Mul<&'a T, Output = T>, T: Add<Output = T> {
     type Output = Matrix22<T>;
 
@@ -107,6 +66,22 @@ impl<T> Add<&Matrix22<T>> for &Matrix22<T> where for<'a> &'a T: Add<&'a T, Outpu
                 ]
             ]
         }
+    }
+}
+
+impl<T> Mul<Matrix22<T>> for Matrix22<T> where for<'a> &'a T: Add<&'a T, Output = T> + Mul<&'a T, Output = T>, T: Add<Output =T> {
+     type Output = Matrix22<T>;
+
+     fn mul(self, other: Matrix22<T>) -> Self::Output {
+         &self * &other
+     }
+}
+
+impl<T> Add<Matrix22<T>> for Matrix22<T> where for<'a> &'a T: Add<&'a T, Output = T> {
+    type Output = Matrix22<T>;
+
+    fn add(self, other: Matrix22<T>) -> Self::Output {
+        &self + &other
     }
 }
 
