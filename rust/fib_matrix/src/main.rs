@@ -3,7 +3,7 @@ use std::str::FromStr;
 use num_bigint::BigUint;
 
 use crate::fib::fib;
-
+mod matrix22;
 mod fib;
 
 fn main() {
