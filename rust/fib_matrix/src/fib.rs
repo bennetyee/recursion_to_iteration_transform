@@ -3,6 +3,8 @@ use num_traits::{Zero, One};
 
 use crate::matrix::*;
 
+pub type FibUint = BigUint;
+
 type TransformMatrix = Matrix<BigUint, 2usize>;
 // type StateVec = Vector<BigUint, 2usize>;
 
