@@ -118,8 +118,6 @@ impl<T, const N: usize> Add<Matrix<T, N>> for Matrix<T, N> where T: Zero + Defau
     }
 }
 
-pub type Matrix22<T> = Matrix<T, 2usize>;
-
 #[derive(Clone)]
 pub struct Vector<T, const N: usize> {
      pub elts: [T; N]
