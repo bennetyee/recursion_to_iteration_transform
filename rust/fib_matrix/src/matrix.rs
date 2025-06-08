@@ -182,6 +182,13 @@ impl<T, const N: usize> Vector<T, N> {
         }
     }
 
+    pub fn from_unsigned<S>(elts: &[S; N]) -> Self where
+        S: Unsigned + Clone,
+        T: From<S>,
+    {
+        Self::new(from_fn(|ix| elts[ix].clone().into()))
+    }
+
     pub fn get<'a>(&'a self, ix: usize) -> &'a T {
         &self.elts[ix]
     }
