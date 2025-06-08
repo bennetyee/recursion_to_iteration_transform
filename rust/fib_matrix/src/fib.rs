@@ -32,14 +32,14 @@ pub fn fib(n: &BigUint) -> BigUint {
             n = &n / 2u8;
         }
 
-        // let v = &res * &StateVec::new([BigUint::one(), BigUint::ZERO]);
-        // v[0].clone()
-
-        // res[0][0].clone()
-
-        // default/swap is cheaper than clone
+        // default-then-swap is cheaper than clone, since output is large
         let mut result = BigUint::default();
+
+        // let mut v = &res * &StateVec::from_unsigned(&[1, 0u8]);
+        // mem::swap(&mut result, &mut v[0]);
+
         mem::swap(&mut result, &mut res[0][0]);
+
         result
     }
 }

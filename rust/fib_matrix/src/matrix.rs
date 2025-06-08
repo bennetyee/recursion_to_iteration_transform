@@ -255,23 +255,18 @@ impl<T, const N: usize> Zero for Vector<T, N> where
 
 impl<T, const N: usize> Mul<&Vector<T, N>> for &Matrix<T, N> where
     for<'a> &'a T: Add<&'a T, Output = T> + Mul<&'a T, Output = T>,
-    T: Zero + Default,
+    T: std::iter::Sum,
 {
     type Output = Vector<T, N>;
 
     fn mul(self, other: &Vector<T, N>) -> Self::Output
     {
-        let mut e: [T; N] = from_fn(|_| T::default());
-        for r in 0..N {
-            let mut sum = T::zero();
-            for c in 0..N {
-                let prod = &self.elts[r][c] * &other.elts[r];
-                sum = &sum + &prod;
-            }
-            e[r] = sum;
-        }
         Self::Output {
-            elts: e
+            elts: from_fn(
+                |ix| (0..N)
+                    .map(|c| &self.elts[ix][c] * &other.elts[c])
+                    .sum()
+            )
         }
     }
 }
