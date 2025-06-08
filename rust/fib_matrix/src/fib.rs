@@ -1,7 +1,7 @@
 use num_bigint::BigUint;
 use num_traits::One;
 
-use crate::matrix22::*;
+use crate::matrix::*;
 
 type BigUintMatrix = Matrix22<BigUint>;
 // type BigUintVec = Vector2<BigUint>;
@@ -11,7 +11,7 @@ pub fn fib(n: &BigUint) -> BigUint {
     if &n <= &BigUint::one() {
         n
     } else {
-        let mut t = BigUintMatrix::new(BigUint::one(), BigUint::one(), BigUint::one(), BigUint::ZERO);
+        let mut t = BigUintMatrix::new([[BigUint::one(), BigUint::one()], [BigUint::one(), BigUint::ZERO]]);
         let mut res = BigUintMatrix::one();
 
         n = &n - 1u32;
