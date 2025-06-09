@@ -1,4 +1,4 @@
-// use num::BigUint;
+// use num::BigUint;  // num pulls in the num_bigint crate
 use num_bigint::BigUint;
 use num_traits::{One, Pow};
 use std::mem;
@@ -11,10 +11,10 @@ type TransformMatrix = Matrix<BigUint, 2usize>;
 // type StateVec = Vector<BigUint, 2usize>;
 
 pub fn fib(n: &BigUint) -> BigUint {
-    if &n <= &BigUint::one() {
-        n
+    if n <= &BigUint::one() {
+        n.clone()
     } else {
-        let t = TransformMatrix::from_unsigned(
+        let t = TransformMatrix::from_unsigned_array(
             &[
                 [1, 1],
                 [1, 0u8],
@@ -26,7 +26,7 @@ pub fn fib(n: &BigUint) -> BigUint {
         // default-then-swap is cheaper than clone, since output is large
         let mut result = BigUint::default();
 
-        // let mut v = &res * &StateVec::from_unsigned(&[1, 0u8]);
+        // let mut v = &res * &StateVec::from_unsigned_array(&[1, 0u8]);
         // mem::swap(&mut result, &mut v[0]);
 
         mem::swap(&mut result, &mut res[0][0]);

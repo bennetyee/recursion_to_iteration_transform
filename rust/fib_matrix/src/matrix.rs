@@ -17,7 +17,7 @@ impl <T, const N: usize> Matrix<T, N> {
         }
     }
 
-    pub fn from_unsigned<S>(elts: &[[S; N]; N]) -> Self where
+    pub fn from_unsigned_array<S>(elts: &[[S; N]; N]) -> Self where
         S: Unsigned + Clone,
         T: From<S>,
     {
@@ -217,7 +217,7 @@ impl<T, const N: usize> Vector<T, N> {
         }
     }
 
-    pub fn from_unsigned<S>(elts: &[S; N]) -> Self where
+    pub fn from_unsigned_array<S>(elts: &[S; N]) -> Self where
         S: Unsigned + Clone,
         T: From<S>,
     {
