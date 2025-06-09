@@ -1,12 +1,9 @@
-use num_traits::Zero;
-use num_traits::One;
-use num_traits::Unsigned;
+use num_traits::{One, Pow, Unsigned, Zero};
 
 use std::array::from_fn;
+use std::cmp::PartialEq;
 use std::default::Default;
-use std::ops::Mul;
-use std::ops::Add;
-use std::ops::{Index, IndexMut};
+use std::ops::{Add, Div, Index, IndexMut, Mul, Rem};
 
 #[derive(Clone)]
 pub struct Matrix<T, const N: usize>  {
@@ -146,6 +143,44 @@ impl<T, const N: usize> Add<&Matrix<T, N>> for &Matrix<T, N> where
                 )
             )
         }
+    }
+}
+
+impl<T, const N: usize> Pow<T> for Matrix<T, N> where
+    Matrix<T, N>: One + Clone + Mul,
+    for<'a> &'a T: Add<&'a T, Output = T> + Div<u8, Output = T> + Mul<&'a T, Output = T> + Rem<u8, Output = T>,
+    for<'a> &'a Matrix<T, N>: Mul<&'a Matrix<T, N>, Output = Matrix<T, N>>,
+    T: Clone + PartialEq + Zero + std::iter::Sum,
+{
+    type Output = Matrix<T, N>;
+
+    fn pow(self, exp: T) -> Matrix<T, N>
+    {
+        let mut b = self.clone();
+        let mut n = exp.clone();
+        let mut res = Matrix::<T, N>::one();
+        while !n.is_zero() {
+            if (&n % 2u8) != T::zero() {
+                res = &res * &b;
+            }
+            b = &b * &b;
+            n = &n / 2u8;
+        }
+        res
+    }
+}
+
+impl<T, const N: usize> Pow<usize> for Matrix<T, N> where
+    Matrix<T, N>: One + Clone + Mul + for<'a> Pow<&'a T, Output = Matrix<T, N>>,
+    for<'a> &'a T: Add<&'a T, Output = T> + Div<u8, Output = T> + Mul<&'a T, Output = T> + Rem<u8, Output = T>,
+    for<'a> &'a Matrix<T, N>: Mul<&'a Matrix<T, N>, Output = Matrix<T, N>>,
+    T: Clone + PartialEq + Zero + std::iter::Sum + From<usize>,
+{
+    type Output = Self;
+
+    fn pow(self, exp: usize) -> Matrix<T, N> {
+        let texp: T = exp.into();
+        self.pow(&texp)
     }
 }
 
