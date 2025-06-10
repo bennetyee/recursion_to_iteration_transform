@@ -7,7 +7,7 @@ use crate::matrix::*;
 
 pub type FibUint = BigUint;
 
-type TransformMatrix = Matrix<BigUint, 2usize>;
+type TransformMatrix = Matrix<BigUint, 2usize, 2usize>;
 // type StateVec = Vector<BigUint, 2usize>;
 
 pub fn fib(n: &BigUint) -> BigUint {

@@ -6,18 +6,19 @@ use std::default::Default;
 use std::ops::{Add, Div, Index, IndexMut, Mul, Rem};
 
 #[derive(Clone)]
-pub struct Matrix<T, const N: usize>  {
-    elts: [[T; N]; N],
+pub struct Matrix<T, const M: usize, const N: usize>  {
+    // M rows and N columns
+    elts: [[T; N]; M],
 }
 
-impl <T, const N: usize> Matrix<T, N> {
-    pub fn new(elts: [[T; N]; N]) -> Self {
+impl <T, const M: usize, const N: usize> Matrix<T, M, N> {
+    pub fn new(elts: [[T; N]; M]) -> Self {
         Self {
             elts: elts
         }
     }
 
-    pub fn from_unsigned_array<S>(elts: &[[S; N]; N]) -> Self where
+    pub fn from_unsigned_array<S>(elts: &[[S; N]; M]) -> Self where
         S: Unsigned + Clone,
         T: From<S>,
     {
@@ -38,7 +39,9 @@ impl <T, const N: usize> Matrix<T, N> {
     }
 }
 
-impl<T, const N: usize> Index<usize> for Matrix<T, N> where
+impl<T, const M: usize, const N: usize>
+    Index<usize> for Matrix<T, M, N>
+where
 {
     type Output = [T; N];
     fn index<'a>(&'a self, index: usize) -> &'a Self::Output {
@@ -46,14 +49,18 @@ impl<T, const N: usize> Index<usize> for Matrix<T, N> where
     }
 }
 
-impl<T, const N: usize> IndexMut<usize> for Matrix<T, N> where
+impl<T, const M: usize, const N: usize>
+    IndexMut<usize> for Matrix<T, M, N>
+where
 {
     fn index_mut(&mut self, index: usize) -> &mut [T; N] {
         &mut self.elts[index]
     }
 }
 
-impl<T, const N: usize> Default for Matrix<T, N> where
+impl<T, const M: usize, const N: usize>
+    Default for Matrix<T, M, N>
+where
     T: Default,
 {
     fn default() -> Self {
@@ -67,8 +74,11 @@ impl<T, const N: usize> Default for Matrix<T, N> where
     }
 }
 
-impl<T, const N: usize> One for Matrix<T, N> where
-    Matrix<T, N>: Mul<Output = Matrix<T, N>>,
+// Multiplicative identity defined only for square matrices
+impl<T, const N: usize>
+    One for Matrix<T, N, N>
+where
+    Matrix<T, N, N>: Mul<Output = Matrix<T, N, N>>,
     T: Zero + One + Default + Add + Mul,
 {
     fn one() -> Self {
@@ -86,8 +96,10 @@ impl<T, const N: usize> One for Matrix<T, N> where
     }
 }
 
-impl<T, const N: usize> Zero for Matrix<T, N> where
-    Matrix<T, N>: Add<Output = Matrix<T, N>>,
+impl<T, const M: usize, const N: usize>
+    Zero for Matrix<T, M, N>
+where
+    Matrix<T, M, N>: Add<Output = Matrix<T, M, N>>,
     T: Zero,
 {
     fn zero() -> Self {
@@ -109,17 +121,19 @@ impl<T, const N: usize> Zero for Matrix<T, N> where
 }
 
 
-impl<T, const N: usize> Mul<&Matrix<T, N>> for &Matrix<T, N> where
+impl<T, const L: usize, const M: usize, const N: usize>
+    Mul<&Matrix<T, M, N>> for &Matrix<T, L, M>
+where
     for<'a> &'a T: Add<&'a T, Output = T> + Mul<&'a T, Output = T>,
     T: std::iter::Sum,
 {
-    type Output = Matrix<T, N>;
+    type Output = Matrix<T, L, N>;
 
-    fn mul(self, other: &Matrix<T, N>) -> Self::Output {
+    fn mul(self, other: &Matrix<T, M, N>) -> Self::Output {
         Self::Output {
             elts: from_fn(
                 |r| from_fn(
-                    |c| (0..N)
+                    |c| (0..M)
                         .map(|n| &self.elts[r][n] * &other.elts[n][c])
                         .sum()
                 )
@@ -128,12 +142,14 @@ impl<T, const N: usize> Mul<&Matrix<T, N>> for &Matrix<T, N> where
     }
 }
 
-impl<T, const N: usize> Add<&Matrix<T, N>> for &Matrix<T, N> where
+impl<T, const M: usize, const N: usize>
+    Add<&Matrix<T, M, N>> for &Matrix<T, M, N>
+where
     for<'a> &'a T: Add<&'a T, Output = T>,
 {
-    type Output = Matrix<T, N>;
+    type Output = Matrix<T, M, N>;
 
-    fn add(self, other: &Matrix<T, N>) -> Self::Output {
+    fn add(self, other: &Matrix<T, M, N>) -> Self::Output {
         Self::Output {
             elts: from_fn(
                 |r| from_fn(
@@ -146,19 +162,21 @@ impl<T, const N: usize> Add<&Matrix<T, N>> for &Matrix<T, N> where
     }
 }
 
-impl<T, const N: usize> Pow<T> for Matrix<T, N> where
-    Matrix<T, N>: One + Clone + Mul,
+impl<T, const N: usize>
+    Pow<T> for Matrix<T, N, N>
+where
+    Matrix<T, N, N>: One + Clone + Mul,
     for<'a> &'a T: Add<&'a T, Output = T> + Div<u8, Output = T> + Mul<&'a T, Output = T> + Rem<u8, Output = T>,
-    for<'a> &'a Matrix<T, N>: Mul<&'a Matrix<T, N>, Output = Matrix<T, N>>,
+    for<'a> &'a Matrix<T, N, N>: Mul<&'a Matrix<T, N, N>, Output = Matrix<T, N, N>>,
     T: Clone + PartialEq + Zero + std::iter::Sum,
 {
-    type Output = Matrix<T, N>;
+    type Output = Matrix<T, N, N>;
 
-    fn pow(self, exp: T) -> Matrix<T, N>
+    fn pow(self, exp: T) -> Matrix<T, N, N>
     {
         let mut b = self.clone();
         let mut n = exp.clone();
-        let mut res = Matrix::<T, N>::one();
+        let mut res = Matrix::<T, N, N>::one();
         while !n.is_zero() {
             if (&n % 2u8) != T::zero() {
                 res = &res * &b;
@@ -170,37 +188,43 @@ impl<T, const N: usize> Pow<T> for Matrix<T, N> where
     }
 }
 
-impl<T, const N: usize> Pow<usize> for Matrix<T, N> where
-    Matrix<T, N>: One + Clone + Mul + for<'a> Pow<&'a T, Output = Matrix<T, N>>,
+impl<T, const N: usize>
+    Pow<usize> for Matrix<T, N, N>
+where
+    Matrix<T, N, N>: One + Clone + Mul + for<'a> Pow<&'a T, Output = Matrix<T, N, N>>,
     for<'a> &'a T: Add<&'a T, Output = T> + Div<u8, Output = T> + Mul<&'a T, Output = T> + Rem<u8, Output = T>,
-    for<'a> &'a Matrix<T, N>: Mul<&'a Matrix<T, N>, Output = Matrix<T, N>>,
+    for<'a> &'a Matrix<T, N, N>: Mul<&'a Matrix<T, N, N>, Output = Matrix<T, N, N>>,
     T: Clone + PartialEq + Zero + std::iter::Sum + From<usize>,
 {
     type Output = Self;
 
-    fn pow(self, exp: usize) -> Matrix<T, N> {
+    fn pow(self, exp: usize) -> Matrix<T, N, N> {
         let texp: T = exp.into();
         self.pow(&texp)
     }
 }
 
-impl<T, const N: usize> Mul<Matrix<T, N>> for Matrix<T, N> where
+impl<T, const L: usize, const M: usize, const N: usize>
+    Mul<Matrix<T, M, N>> for Matrix<T, L, M>
+where
     for<'a> &'a T: Add<&'a T, Output = T> + Mul<&'a T, Output = T>,
     T: std::iter::Sum,
 {
-     type Output = Self;
+     type Output = Matrix<T, L, N>;
 
-     fn mul(self, other: Matrix<T, N>) -> Self::Output {
+     fn mul(self, other: Matrix<T, M, N>) -> Self::Output {
          &self * &other
      }
 }
 
-impl<T, const N: usize> Add<Matrix<T, N>> for Matrix<T, N> where
+impl<T, const M: usize, const N: usize>
+    Add<Matrix<T, M, N>> for Matrix<T, M, N>
+where
     for<'a> &'a T: Add<&'a T, Output = T>,
 {
     type Output = Self;
 
-    fn add(self, other: Matrix<T, N>) -> Self::Output {
+    fn add(self, other: Matrix<T, M, N>) -> Self::Output {
         &self + &other
     }
 }
@@ -233,7 +257,9 @@ impl<T, const N: usize> Vector<T, N> {
     }
 }
 
-impl<T, const N: usize> Vector<T, N> where
+impl<T, const N: usize>
+    Vector<T, N>
+where
     for<'a> &'a T: Add<&'a T, Output = T> + Mul<&'a T, Output = T>,
     T: Add<Output = T> + std::iter::Sum,
 {
@@ -242,7 +268,9 @@ impl<T, const N: usize> Vector<T, N> where
     }
 }
 
-impl<T, const N: usize> Index<usize> for Vector<T, N> where
+impl<T, const N: usize>
+    Index<usize> for Vector<T, N>
+where
 {
     type Output = T;
     fn index<'a>(&'a self, index: usize) -> &'a Self::Output {
@@ -250,14 +278,18 @@ impl<T, const N: usize> Index<usize> for Vector<T, N> where
     }
 }
 
-impl<T, const N: usize> IndexMut<usize> for Vector<T, N> where
+impl<T, const N: usize>
+    IndexMut<usize> for Vector<T, N>
+where
 {
     fn index_mut(&mut self, index: usize) -> &mut T {
         &mut self.elts[index]
     }
 }
 
-impl<T, const N: usize> Default for Vector<T, N> where
+impl<T, const N: usize>
+    Default for Vector<T, N>
+where
     T: Default
 {
     fn default() -> Self {
@@ -288,11 +320,13 @@ impl<T, const N: usize> Zero for Vector<T, N> where
     }
 }
 
-impl<T, const N: usize> Mul<&Vector<T, N>> for &Matrix<T, N> where
+impl<T, const M: usize, const N: usize>
+    Mul<&Vector<T, N>> for &Matrix<T, M, N>
+where
     for<'a> &'a T: Add<&'a T, Output = T> + Mul<&'a T, Output = T>,
     T: std::iter::Sum,
 {
-    type Output = Vector<T, N>;
+    type Output = Vector<T, M>;
 
     fn mul(self, other: &Vector<T, N>) -> Self::Output
     {
@@ -306,7 +340,9 @@ impl<T, const N: usize> Mul<&Vector<T, N>> for &Matrix<T, N> where
     }
 }
 
-impl<T, const N: usize> Add<&Vector<T, N>> for &Vector<T, N> where
+impl<T, const N: usize>
+    Add<&Vector<T, N>> for &Vector<T, N>
+where
     for<'a> &'a T: Add<&'a T, Output = T>,
     T: Zero,
 {
