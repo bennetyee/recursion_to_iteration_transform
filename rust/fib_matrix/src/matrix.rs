@@ -5,7 +5,7 @@ use std::cmp::PartialEq;
 use std::default::Default;
 use std::ops::{Add, Div, Index, IndexMut, Mul, Rem};
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Debug)]
 pub struct Matrix<T, const M: usize, const N: usize>  {
     // M rows and N columns
     elts: [[T; N]; M],
@@ -229,7 +229,7 @@ where
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Debug)]
 pub struct Vector<T, const N: usize> {
      elts: [T; N]
 }
@@ -353,5 +353,114 @@ where
         Self::Output {
             elts: e
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use num::BigUint;
+    use std::str::FromStr;
+
+    #[test]
+    fn create_and_access() {
+        let m = Matrix::<BigUint, 2usize, 3usize>::from_unsigned_array(
+            &[
+                [ 1, 2, 3 ],
+                [ 4, 5, 6u8 ]
+            ]
+        );
+        assert_eq!(m[0][0], 1u8.into());
+        assert_eq!(m[1][2], 6u8.into());
+    }
+
+    #[test]
+    fn modify_and_compare() {
+        let mut m = Matrix::<BigUint, 2usize, 3usize>::from_unsigned_array(
+            &[
+                [ 1, 2, 3 ],
+                [ 4, 5, 6u8 ]
+            ]
+        );
+        m[0][0] = 7u8.into();
+        assert_eq!(m, Matrix::<BigUint, 2usize, 3usize>::from_unsigned_array(
+            &[
+                [ 7, 2, 3 ],
+                [ 4, 5, 6u8 ]
+            ]
+        ));
+    }
+
+    fn fib(n: usize) -> BigUint {
+        let t = Matrix::<BigUint, 2usize, 2usize>::from_unsigned_array(
+            &[
+                [1, 1],
+                [1, 0u8],
+            ]
+        );
+        let tn = t.pow(n.into());
+        let state = Vector::<BigUint, 2usize>::from_unsigned_array(
+            &[1, 0u8]);
+        let res = &tn * &state;
+        res[1].clone()
+    }
+
+    fn fib_slow(mut n: usize) -> BigUint {
+        let mut a: BigUint = 0u32.into();
+        let mut b: BigUint = 1u32.into();
+
+        while n > 0 {
+            (b, a) = (&a + &b, b);
+            n = n - 1;
+        }
+        a
+    }
+
+    #[test]
+    fn big_fib() {
+        assert_eq!(fib(5000), fib_slow(5000));
+        assert_eq!(fib(5000),
+                   BigUint::from_str("3878968454388325633701916308325905312082127714646245106160597214895550139044037097010822916462210669479293452858882973813483102008954982940361430156911478938364216563944106910214505634133706558656238254656700712525929903854933813928836378347518908762970712033337052923107693008518093849801803847813996748881765554653788291644268912980384613778969021502293082475666346224923071883324803280375039130352903304505842701147635242270210934637699104006714174883298422891491273104054328753298044273676822977244987749874555691907703880637046832794811358973739993110106219308149018570815397854379195305617510761053075688783766033667355445258844886241619210553457493675897849027988234351023599844663934853256411952221859563060475364645470760330902420806382584929156452876291575759142343809142302917491088984155209854432486594079793571316841692868039545309545388698114665082066862897420639323438488465240988742395873801976993820317174208932265468879364002630797780058759129671389634214252579116872755600360311370547754724604639987588046985178408674382863125").expect("test coding error?!?"));
+    }
+
+    #[test]
+    fn rectangular_mul() {
+        let m = Matrix::<BigUint, 2usize, 3usize>::from_unsigned_array(
+            &[
+                [1, 2, 3],
+                [4, 5, 6u8],
+            ]);
+        let n = Matrix::<BigUint, 3usize, 2usize>::from_unsigned_array(
+            &[
+                [4, 3],
+                [2, 1],
+                [1, 2u8],
+            ]);
+        let prod = m * n;
+        let expected = Matrix::<BigUint, 2usize, 2usize>::from_unsigned_array(
+            &[
+                [4 + 2*2 + 3, 3 + 2 + 2 * 3],
+                [4 * 4 + 2 * 5 + 6, 3 * 4 + 5 + 2 * 6u16],
+            ]);
+        assert_eq!(&prod, &expected);
+    }
+
+    #[test]
+    fn vector_mul_and_dot() {
+        let n = Matrix::<BigUint, 3usize, 2usize>::from_unsigned_array(
+            &[
+                [4, 3],
+                [2, 1],
+                [1, 2u8],
+            ]);
+        let v = Vector::<BigUint, 2usize>::from_unsigned_array(
+            &[2, 3u8]);
+        let w = &n * &v;
+        let expected = Vector::<BigUint, 3usize>::from_unsigned_array(
+            &[2*4 + 3*3, 2*2 + 3*1, 2*1 + 3*2u16]);
+        assert_eq!(&w, &expected);
+
+        let dot = v.dot(&v);
+        assert_eq!(dot, (4 + 9u8).into());
     }
 }
